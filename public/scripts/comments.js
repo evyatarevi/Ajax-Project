@@ -21,8 +21,8 @@ const createCommentsList = (comments) => {
 }
 
 const fetchComments = async () => {
-    const postId = loadCommentsBtnElement.dataset.postid; // 'dataset'- access to all 'data' attributes we added. 'postId' - my identifier.
-    //another option access to the button: 'event.target'.
+    const postId = loadCommentsBtnElement.dataset.postid; // 'dataset'- access to all 'data' attributes we added. 'postId' - the identifier.
+    //-> another option access to the button: 'event.target'.
     try {
         const response = await fetch(`/posts/${postId}/comments`);
         if(!response.ok){  //handel server error
@@ -61,9 +61,9 @@ commentFormElement.addEventListener('submit', async (event) => {
     try {
         const response = await fetch(`/posts/${postId}/comments`,
             {method: 'POST',
-             headers: {
-                // 'Content-Type' - put it between single quotes, because it contains a dash.
-                'Content-Type': 'application/json'}, //the 'Content-Type' header indicating JSON data.
+             headers: { // 'Content-Type' - put it between single quotes, because it contains a dash.
+                'Content-Type': 'application/json'
+                }, //the 'Content-Type' header indicating JSON data.
                 // In default request the browser send the type, but here we set it since we send own request.
             body: JSON.stringify(commentData) // Convert the data to JSON format
             });
@@ -80,8 +80,25 @@ commentFormElement.addEventListener('submit', async (event) => {
 
 })  
 
+/*
+JSON.parse() vs .json()
+In summary, JSON.parse() is used to convert a JSON string into a JavaScript object,It's typically used when you receive
+JSON data from an API or server and you need to work with that data as a JavaScript object in your client-side code. Typically when you already have a JSON string:
 
+    const jsonString = '{"key": "value"}';
+    const parsedData = JSON.parse(jsonString);
 
+On the other hand, .json() is used with the fetch() function to handle the response of a network request,
+parsing the JSON response body into a JavaScript object for easier manipulation:
+
+    fetch('https://api.example.com/data')
+    .then(response => response.json())
+    .then(data => {
+        // 'data' here is a JavaScript object parsed from the JSON response
+    });
+
+They serve different purposes but both are essential tools in working with JSON data on the client side.
+*/
 
 
 

@@ -15,7 +15,7 @@ router.get('/posts', async function (req, res) {
   const posts = await db
     .getDb()
     .collection('posts')
-    .find({}, { title: 1, summary: 1, 'author.name': 1 })
+    .find({}, { title: 1, summary: 1, 'author.name': 1 })  // 'author.name' between '' because the dot (.).
     .toArray();
   res.render('posts-list', { posts: posts });
 });
@@ -45,7 +45,6 @@ router.post('/posts', async function (req, res) {
   };
 
   const result = await db.getDb().collection('posts').insertOne(newPost);
-  console.log(result);
   res.redirect('/posts');
 });
 
@@ -60,13 +59,14 @@ router.get('/posts/:id', async function (req, res) {
     return res.status(404).render('404');
   }
 
-  post.humanReadableDate = post.date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  post.humanReadableDate = post.date.toLocaleDateString('en-US', {  //create a human-readable date string in the specified locale (in this case, 'en-US', which is American English).
+    // The second argument to the function is an options object that defines how the date should be formatted
+    weekday: 'long',  // the full weekday name (e.g., "Monday") should be included.
+    year: 'numeric',  // the full year (e.g., "2023") should be included.
+    month: 'long',    // the full month name (e.g., "August") should be included.
+    day: 'numeric',   // the day of the month (e.g., "31") should be included.
   });
-  post.date = post.date.toISOString();
+  post.date = post.date.toISOString();  //converts the date to a string representation in the ISO 8601 format (like "2023-08-31T00:00:00.000Z").
   
   res.render('post-detail', { post: post, comments: null });
 });
@@ -122,7 +122,7 @@ router.get('/posts/:id/comments', async function (req, res) {
     .collection('comments')
     .find({ postId: postId }).toArray();
 
-  return res.json(comments);  /*json() - built-in method of res, encode data as JSON for sending back JSON data.
+  return res.json(comments);  /*res.json() - built-in method of Express, encode data as JSON for sending back JSON data.
   Not that json() in the browser side is different method that decode data. Because JSON is that data format,
   that machine-readable data format, which is typically used for transmitting data between client and server.
   'comments' - the data which should encoded and send back. another option is send as object in parameter: {comments: comments}.
@@ -147,3 +147,33 @@ router.post('/posts/:id/comments', async function (req, res) {
 });
 
 module.exports = router;
+
+
+
+/*
+The ISO 8601 format is a standardized way of representing dates, times, and durations.
+It was developed by the International Organization for Standardization (ISO) to provide a consistent and unambiguous 
+way to express temporal information, regardless of cultural or regional differences. ISO 8601 is widely used in various
+contexts for communication, data interchange, and storage due to its clarity and precision.
+*/
+
+/*
+JSON.stringify() vs res.json()
+If you use JSON.stringify() directly, you have more control over the JSON serialization process.
+You can manipulate the object and customize how it is transformed into a JSON string before sending it in the response:
+
+    app.get('/data', (req, res) => {
+        const data = { key: 'value' };
+        const jsonString = JSON.stringify(data);
+
+        res.setHeader('Content-Type', 'application/json');
+        res.send(jsonString);
+
+When you use res.json(), Express automatically sets the Content-Type header to application/json and converts the 
+provided JavaScript object into a JSON string using JSON.stringify():
+
+    app.get('/data', (req, res) => {
+        const data = { key: 'value' };
+        res.json(data);
+        });
+*/
